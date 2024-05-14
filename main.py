@@ -47,10 +47,32 @@ def shift_cipher(mode, text, cipher_key):
                 plain_text+=a_z[i]
         return plain_text
 
-plain_text = "we will meet at mid night"
-cipher_key = 11
+def mono_alphabetic_cipher(mode, text, cipher_key:str):
+    cipher_key = u(u(cipher_key.upper()) + A_Z)
+    if mode == ENCRYPT_MODE:
+        cipher_text = ''
+        for char in text.upper():
+            if char in A_Z:
+                i = A_Z.index(char)
+                cipher_text+=cipher_key[i]
+        return cipher_text, cipher_key
+    elif mode == DECRYPT_MODE:
+        plain_text = ''
+        for char in text.upper():
+            if char in cipher_key:
+                i = cipher_key.index(char)
+                plain_text+=A_Z[i]
+        return plain_text, cipher_key
+
+
 
 
 
 # Examples
+plain_text = "we will meet at mid night"
+cipher_key = 11
+
 print(shift_cipher(ENCRYPT_MODE, plain_text, cipher_key))
+
+
+
