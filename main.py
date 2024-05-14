@@ -64,6 +64,26 @@ def mono_alphabetic_cipher(mode, text, cipher_key:str):
                 plain_text+=A_Z[i]
         return plain_text, cipher_key
 
+def affine_cipher(mode, text, cipher_key:tuple):
+    a=cipher_key[0]
+    a_inverse = multiplicative_inverse(a, len(a_z))
+    b=cipher_key[1]
+    if mode == ENCRYPT_MODE:
+        cipher_text = ''
+        for char in text.lower():
+            if char in a_z:
+                m = a_z.index(char)
+                i = (a * m + b) % len(a_z)
+                cipher_text += a_z[i]
+        return cipher_text
+    elif mode == DECRYPT_MODE:
+        plain_text = ''
+        for char in text.lower():
+            if char in a_z:
+                c = a_z.index(char)
+                i = (a_inverse * (c-b))%len(a_z)
+                plain_text+=a_z[i]
+        return plain_text
 
 
 
@@ -73,6 +93,9 @@ plain_text = "we will meet at mid night"
 cipher_key = 11
 
 print(shift_cipher(ENCRYPT_MODE, plain_text, cipher_key))
+print("mono_alphabetic_cipher", mono_alphabetic_cipher(DECRYPT_MODE, "MKJKSIKUP", "EXAMPLE"))
+print(affine_cipher(ENCRYPT_MODE, "hot", (7, 3)))
+print(affine_cipher(DECRYPT_MODE, "axg", (7, 3)))
 
 
 
