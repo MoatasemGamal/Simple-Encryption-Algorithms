@@ -29,3 +29,28 @@ def multiplicative_inverse(a, m):
 #============================================================================================
 
 
+def shift_cipher(mode, text, cipher_key):
+    if mode == ENCRYPT_MODE:
+        cipher_text = ''
+        for char in text.lower():
+            if char in a_z:
+                c_index = a_z.index(char)
+                i = (c_index+int(cipher_key)) % len(a_z)
+                cipher_text+=a_z[i]
+        return cipher_text
+    elif mode == DECRYPT_MODE:
+        plain_text = ''
+        for char in text.lower():
+            if char in a_z:
+                c_index = a_z.index(char)
+                i = (c_index-int(cipher_key)) % len(a_z)
+                plain_text+=a_z[i]
+        return plain_text
+
+plain_text = "we will meet at mid night"
+cipher_key = 11
+
+
+
+# Examples
+print(shift_cipher(ENCRYPT_MODE, plain_text, cipher_key))
