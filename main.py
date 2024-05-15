@@ -1,3 +1,6 @@
+import math
+import re
+
 ENCRYPT_MODE = 'encrypt'
 DECRYPT_MODE = 'decrypt'
 
@@ -70,6 +73,7 @@ def mono_alphabetic_cipher(mode, text, cipher_key:str):
         return plain_text, cipher_key
 
 def affine_cipher(mode, text, cipher_key:tuple):
+    text=re.sub('[^'+"".join(a_z)+']*', '', text.lower())
     a=cipher_key[0]
     a_inverse = multiplicative_inverse(a, len(a_z))
     b=cipher_key[1]
@@ -91,7 +95,7 @@ def affine_cipher(mode, text, cipher_key:tuple):
         return plain_text
 
 def play_fair_cipher(mode, text, key):
-    text = text.upper().replace('J', 'I').replace(' ','') 
+    text=re.sub('[^'+"".join(A_Z)+']*', '', text.upper()).replace('J', 'I')
     key = u(key.upper().replace('J', 'I').replace(' ',''))
     A_Z_without_j = A_Z.copy()
     A_Z_without_j[A_Z_without_j.index('J')] = 'I'
@@ -152,6 +156,48 @@ def play_fair_cipher(mode, text, key):
         return plaintext, key
 
 
+def vigenere_cipher(mode, text, cipher_key):
+    text=re.sub('[^'+"".join(A_Z)+']*', '', text.upper())
+    if len(cipher_key) < len(text):
+        cipher_key = cipher_key * math.ceil(len(text)/len(cipher_key))
+    if type(cipher_key) == str:
+        cipher_key=cipher_key.upper()
+    else:
+        cipher_key = ''.join([A_Z[int(e)] for e in cipher_key])
+
+    if mode == ENCRYPT_MODE:
+        cipher_text = ''
+        for i in range(len(text)):
+            if text[i] in A_Z and cipher_key[i] in A_Z:
+                idx=(A_Z.index(text[i]) + A_Z.index(cipher_key[i])) % len(A_Z)
+                cipher_text += A_Z[idx]
+        return cipher_text
+    elif mode == DECRYPT_MODE:
+        plain_text = ''
+        for i in range(len(text)):
+            if text[i] in A_Z and cipher_key[i] in A_Z:
+                idx=(A_Z.index(text[i]) - A_Z.index(cipher_key[i])) % len(A_Z)
+                plain_text += A_Z[idx]
+        return plain_text
+
+
+def is_binary_string(input_string):
+    # Iterate through each character in the string
+    for char in input_string:
+        # Check if the character is neither '0' nor '1'
+        if char != '0' and char != '1':
+            return False
+    return True
+
+def vernam_cipher(text, cipher_key):
+    if is_binary_string(text):
+        text = int(text, 2)
+    if is_binary_string(cipher_key):
+        cipher_key = int(cipher_key, 2)
+    
+    return bin(text ^ cipher_key)
+
+
 # Examples
 plain_text = "we will meet at mid night"
 cipher_key = 11
@@ -162,6 +208,6 @@ print(affine_cipher(ENCRYPT_MODE, "hot", (7, 3)))
 print(affine_cipher(DECRYPT_MODE, "axg", (7, 3)))
 print("PlayFair('instruments', 'monarchy')", play_fair_cipher(ENCRYPT_MODE, 'instruments', 'monarchy'))
 print("PlayFair('instruments', 'monarchy')", play_fair_cipher(DECRYPT_MODE, 'GATLMZCLRQXA', 'monarchy'))
-
-
-
+print("vigenere_cipher('tomorrow at the sunset')", vigenere_cipher(ENCRYPT_MODE, 'tomorrow at the sunset', [2, 5, 1, 10, 20]))
+print("vigenere_cipher('tomorrow at the sunset')", vigenere_cipher(DECRYPT_MODE, 'VTNYLTTXKNVMFCOPXFD', [2, 5, 1, 10, 20]))
+print(vernam_cipher("001011010111", "100111001011"))
