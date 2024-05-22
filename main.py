@@ -279,6 +279,24 @@ def des_(mode, text, key:str):
 
         return decrypted_data
 
+import hashlib
+
+def sha_1(mode, text, salt=''):
+    text+=salt
+    # Encode the message to bytes before hashing
+    text_bytes = text.encode('utf-8')
+
+    # Create a SHA-1 hash object
+    sha1_hash = hashlib.sha1()
+
+    # Update the hash object with the message bytes
+    sha1_hash.update(text_bytes)
+
+    # Get the hexadecimal representation of the hash
+    hashed_text = sha1_hash.hexdigest()
+    return hashed_text
+
+
 algorithms = {
     1:shift_cipher,
     2:mono_alphabetic_cipher,
@@ -289,6 +307,7 @@ algorithms = {
     7:rail_fence,
     8:rsa_,
     9:des_,
+    10:sha_1
 }
 
 # Examples
