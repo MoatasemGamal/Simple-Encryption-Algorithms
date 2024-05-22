@@ -271,7 +271,7 @@ def parse_key(key_string):
     return key_list
 
 def hill_cipher_encrypt(mode, plaintext, key):
-    key = parse_key(key_string)
+    key = parse_key(key)
     key_size = len(key)
     padded_plaintext = pad_text(plaintext, key_size)
     key_matrix = np.array(key).reshape(key_size, key_size)
