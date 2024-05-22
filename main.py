@@ -156,8 +156,16 @@ def play_fair_cipher(mode, text, key):
 
         return plaintext #, key
 
+def contains_number(input_string):
+    for char in input_string:
+        if char.isdigit():
+            return True
+    return False
 
 def vigenere_cipher(mode, text, cipher_key):
+    if contains_number(cipher_key):
+        cipher_key=[int(x.strip()) for x in cipher_key.split(',')]
+
     text=re.sub('[^'+"".join(A_Z)+']*', '', text.upper())
     if len(cipher_key) < len(text):
         cipher_key = cipher_key * math.ceil(len(text)/len(cipher_key))
@@ -279,19 +287,19 @@ app = Flask(__name__)
 def enc():
     text = request.form.get('text')
     key = request.form.get('key')
-    algo = request.form.get('algo')
+    algo = request.form.get('algo', type=int)
     
-    text=algorithms.get(int(algo))(ENCRYPT_MODE, text, key)
+    text=algorithms.get(algo)(ENCRYPT_MODE, text, key)
     
     return jsonify({'text':text})
 
-@app.route('/encrypt', methods=['POST'])
-def enc():
+@app.route('/decrypt', methods=['POST'])
+def dec():
     text = request.form.get('text')
     key = request.form.get('key')
-    algo = request.form.get('algo')
+    algo = request.form.get('algo', type=int)
     
-    text=algorithms.get(int(algo))(DECRYPT_MODE, text, key)
+    text=algorithms.get(algo)(DECRYPT_MODE, text, key)
     
     return jsonify({'text':text})
 
