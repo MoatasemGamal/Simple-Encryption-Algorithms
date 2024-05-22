@@ -318,32 +318,37 @@ def rsa_(mode, text, cipher_key=None):
 
 
 
-from pyDes import des, PAD_PKCS5
-import base64
+
+
+from Crypto.Cipher import DES
+
+def pad(text):
+    n = len(text) % 8
+    return text + (b' ' * n)
+def unpad(text):
+    return text.rstrip(b' ')
+
+
+
+
+
 def des_(mode, text, key:str):
     key = key.encode()
+    text=text.encode()
     if mode == ENCRYPT_MODE:
-        # Initialize DES cipher object with the provided key
-        cipher = des(key, PAD_PKCS5)
-
-        # Encrypt the data
-        encrypted_data = cipher.encrypt(text)
-
-        # Encode the encrypted data using base64 for better representation
-        encrypted_data_base64 = base64.b64encode(encrypted_data)
-
-        return encrypted_data_base64
+        des = DES.new(key, DES.MODE_ECB)
+        padded_text = pad(text)
+        encrypted_text = des.encrypt(padded_text)
+        return encrypted_text
+    
     elif mode == DECRYPT_MODE:
-        # Initialize DES cipher object with the provided key
-        cipher = des(key, PAD_PKCS5)
+        des = DES.new(key, DES.MODE_ECB)
+        decrypted_text = des.decrypt(encrypted_text)
 
-        # Decode the base64 encoded encrypted data
-        encrypted_data = base64.b64decode(text)
+        # Remove padding (if any)
+        original_text = unpad(decrypted_text)
 
-        # Decrypt the data
-        decrypted_data = cipher.decrypt(encrypted_data)
-
-        return decrypted_data
+        return original_text.decode('utf-8')
 
 import hashlib
 
