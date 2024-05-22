@@ -72,11 +72,12 @@ def mono_alphabetic_cipher(mode, text, cipher_key:str):
                 plain_text+=A_Z[i]
         return plain_text, cipher_key
 
-def affine_cipher(mode, text, cipher_key:tuple):
+def affine_cipher(mode, text, cipher_key):
+    cipher_key=cipher_key.split(',')
+    a=int(cipher_key[0].stripe())
     text=re.sub('[^'+"".join(a_z)+']*', '', text.lower())
-    a=cipher_key[0]
     a_inverse = multiplicative_inverse(a, len(a_z))
-    b=cipher_key[1]
+    b=int(cipher_key[1].stripe())
     if mode == ENCRYPT_MODE:
         cipher_text = ''
         for char in text.lower():
@@ -136,7 +137,7 @@ def play_fair_cipher(mode, text, key):
             else:
                 cipher_text += matrix[row1][col2] + matrix[row2][col1]
 
-        return cipher_text, key
+        return cipher_text #, key
     
     elif mode == DECRYPT_MODE:
         cipher_text = text
@@ -153,7 +154,7 @@ def play_fair_cipher(mode, text, key):
             else:
                 plaintext += matrix[row1][col2] + matrix[row2][col1]
 
-        return plaintext, key
+        return plaintext #, key
 
 
 def vigenere_cipher(mode, text, cipher_key):
@@ -198,16 +199,101 @@ def vernam_cipher(text, cipher_key):
     return bin(text ^ cipher_key)
 
 
-# Examples
-plain_text = "we will meet at mid night"
-cipher_key = 11
+def rail_fence(mode, text, cipher_key):
+    m = cipher_key # number of rows
+    n = math.ceil(len(text)/cipher_key)  # number of columns
 
-print(shift_cipher(ENCRYPT_MODE, plain_text, cipher_key))
-print("mono_alphabetic_cipher", mono_alphabetic_cipher(DECRYPT_MODE, "MKJKSIKUP", "EXAMPLE"))
-print(affine_cipher(ENCRYPT_MODE, "hot", (7, 3)))
-print(affine_cipher(DECRYPT_MODE, "axg", (7, 3)))
-print("PlayFair('instruments', 'monarchy')", play_fair_cipher(ENCRYPT_MODE, 'instruments', 'monarchy'))
-print("PlayFair('instruments', 'monarchy')", play_fair_cipher(DECRYPT_MODE, 'GATLMZCLRQXA', 'monarchy'))
-print("vigenere_cipher('tomorrow at the sunset')", vigenere_cipher(ENCRYPT_MODE, 'tomorrow at the sunset', [2, 5, 1, 10, 20]))
-print("vigenere_cipher('tomorrow at the sunset')", vigenere_cipher(DECRYPT_MODE, 'VTNYLTTXKNVMFCOPXFD', [2, 5, 1, 10, 20]))
-print(vernam_cipher("001011010111", "100111001011"))
+    matrix = [['' for _ in range(n)] for _ in range(m)]
+    # print(100*"*")
+    # print(matrix)
+    if mode == ENCRYPT_MODE:
+        k=0
+        for i in range(n):
+            for j in range(cipher_key):
+                if k < len(text) :#and i<int(len(text)/cipher_key):
+                    matrix[j][i]=text[k]
+                    k+=1
+        
+        cipher_text=''
+        for i in range(m):
+            cipher_text+=''.join(matrix[i])
+        return cipher_text
+    elif mode == DECRYPT_MODE:
+        k=0
+        for i in range(m):
+            for j in range(math.ceil(len(text)/cipher_key)):
+                if k < len(text) :#and j<int(len(text)/cipher_key):
+                    matrix[i][j] = text[k]
+                    k+=1
+        plain_text=''
+        for i in range(n):
+            plain_text+=''.join([row[i] for row in matrix])
+        return plain_text
+
+import rsa
+def rsa_(mode, text, cipher_key=None):
+    p, q = tuple(cipher_key.split(','))
+    p=int(p.strip())
+    q=int(q.strip())
+
+    if mode == ENCRYPT_MODE:
+        return rsa.RSA_Encryption(text, p, q)
+    elif mode==DECRYPT_MODE:
+        return rsa.RSA_decryption(text, p, q)
+
+
+algorithms = {
+    1:shift_cipher,
+    2:mono_alphabetic_cipher,
+    3:affine_cipher,
+    4:play_fair_cipher,
+    5:vigenere_cipher,
+    6:vernam_cipher,
+    7:rail_fence,
+    8:rsa_
+}
+
+# Examples
+# plain_text = "we will meet at mid night"
+# cipher_key = 11
+
+# print(shift_cipher(ENCRYPT_MODE, plain_text, cipher_key))
+# print("mono_alphabetic_cipher", mono_alphabetic_cipher(DECRYPT_MODE, "MKJKSIKUP", "EXAMPLE"))
+# print(affine_cipher(ENCRYPT_MODE, "hot", (7, 3)))
+# print(affine_cipher(DECRYPT_MODE, "axg", (7, 3)))
+# print("PlayFair('instruments', 'monarchy')", play_fair_cipher(ENCRYPT_MODE, 'instruments', 'monarchy'))
+# print("PlayFair('instruments', 'monarchy')", play_fair_cipher(DECRYPT_MODE, 'GATLMZCLRQXA', 'monarchy'))
+# print("vigenere_cipher('tomorrow at the sunset')", vigenere_cipher(ENCRYPT_MODE, 'tomorrow at the sunset', [2, 5, 1, 10, 20]))
+# print("vigenere_cipher('tomorrow at the sunset')", vigenere_cipher(DECRYPT_MODE, 'VTNYLTTXKNVMFCOPXFD', [2, 5, 1, 10, 20]))
+# print(vernam_cipher("001011010111", "100111001011"))
+
+# print("RAIL FENCE", rail_fence(ENCRYPT_MODE, 'meetmeaftertheparty', 2))
+# print("RAIL FENCE", rail_fence(DECRYPT_MODE, 'mematrhpryetefeteat', 2))
+
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/encrypt', methods=['POST'])
+def enc():
+    text = request.form.get('text')
+    key = request.form.get('key')
+    algo = request.form.get('algo')
+    
+    text=algorithms.get(int(algo))(ENCRYPT_MODE, text, key)
+    
+    return jsonify({'text':text})
+
+@app.route('/encrypt', methods=['POST'])
+def enc():
+    text = request.form.get('text')
+    key = request.form.get('key')
+    algo = request.form.get('algo')
+    
+    text=algorithms.get(int(algo))(DECRYPT_MODE, text, key)
+    
+    return jsonify({'text':text})
+
+if __name__ == '__main__':
+    app.run(debug=True)
