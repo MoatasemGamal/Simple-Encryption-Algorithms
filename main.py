@@ -284,9 +284,13 @@ algorithms = {
 # print("RAIL FENCE", rail_fence(DECRYPT_MODE, 'mematrhpryetefeteat', 2))
 
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 @app.route('/encrypt', methods=['POST'])
 def enc():
