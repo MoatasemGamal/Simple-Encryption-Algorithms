@@ -254,7 +254,7 @@ def rsa_(mode, text, cipher_key=None):
 
 from pyDes import des, PAD_PKCS5
 import base64
-def des(mode, text, key=None):
+def des(mode, text, key:str):
     key = key.encode()
     if mode == ENCRYPT_MODE:
         # Initialize DES cipher object with the provided key
