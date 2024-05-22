@@ -208,6 +208,7 @@ def vernam_cipher(text, cipher_key):
 
 
 def rail_fence(mode, text, cipher_key):
+    cipher_key=int(cipher_key.stripe())
     m = cipher_key # number of rows
     n = math.ceil(len(text)/cipher_key)  # number of columns
 
@@ -249,6 +250,9 @@ def rsa_(mode, text, cipher_key=None):
     elif mode==DECRYPT_MODE:
         return rsa.RSA_decryption(text, p, q)
 
+import DES
+def des(mode, text, key):
+    return DES.encrypt(text, key)
 
 algorithms = {
     1:shift_cipher,
@@ -258,7 +262,8 @@ algorithms = {
     5:vigenere_cipher,
     6:vernam_cipher,
     7:rail_fence,
-    8:rsa_
+    8:rsa_,
+    9:des,
 }
 
 # Examples
