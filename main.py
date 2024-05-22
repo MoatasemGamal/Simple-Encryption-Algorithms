@@ -74,10 +74,10 @@ def mono_alphabetic_cipher(mode, text, cipher_key:str):
 
 def affine_cipher(mode, text, cipher_key):
     cipher_key=cipher_key.split(',')
-    a=int(cipher_key[0].stripe())
+    a=int(cipher_key[0].strip())
     text=re.sub('[^'+"".join(a_z)+']*', '', text.lower())
     a_inverse = multiplicative_inverse(a, len(a_z))
-    b=int(cipher_key[1].stripe())
+    b=int(cipher_key[1].strip())
     if mode == ENCRYPT_MODE:
         cipher_text = ''
         for char in text.lower():
@@ -208,7 +208,7 @@ def vernam_cipher(text, cipher_key):
 
 
 def rail_fence(mode, text, cipher_key):
-    cipher_key=int(cipher_key.stripe())
+    cipher_key=int(cipher_key.strip())
     m = cipher_key # number of rows
     n = math.ceil(len(text)/cipher_key)  # number of columns
 
