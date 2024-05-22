@@ -239,6 +239,72 @@ def rail_fence(mode, text, cipher_key):
             plain_text+=''.join([row[i] for row in matrix])
         return plain_text
 
+
+
+
+
+
+import numpy as np
+
+def char_to_index(char):
+    return ord(char) - ord('a')
+
+def index_to_char(index):
+    return chr(index + ord('a'))
+
+def string_to_numbers(text):
+    return [char_to_index(char) for char in text]
+
+def numbers_to_string(numbers):
+    return ''.join([index_to_char(num) for num in numbers])
+
+def pad_text(text, key_size):
+    padded_text = text
+    while len(padded_text) % key_size != 0:
+        padded_text += 'x'  # Adding 'x' padding
+    return padded_text
+
+def parse_key(key_string):
+    key_list = []
+    for row in key_string.split(','):
+        key_list.append([int(num.strip()) for num in row.split()])
+    return key_list
+
+def hill_cipher_encrypt(mode, plaintext, key):
+    key = parse_key(key_string)
+    key_size = len(key)
+    padded_plaintext = pad_text(plaintext, key_size)
+    key_matrix = np.array(key).reshape(key_size, key_size)
+
+    encrypted_text = ""
+    for i in range(0, len(padded_plaintext), key_size):
+        segment = padded_plaintext[i:i+key_size]
+        segment_numbers = string_to_numbers(segment)
+        segment_matrix = np.array(segment_numbers).reshape(key_size, 1)
+        encrypted_segment_matrix = np.dot(key_matrix, segment_matrix) % 26
+        encrypted_segment_numbers = encrypted_segment_matrix.flatten().tolist()
+        encrypted_segment = numbers_to_string(encrypted_segment_numbers)
+        encrypted_text += encrypted_segment
+
+    return encrypted_text
+
+# # Example usage:
+# a_z = [chr(i) for i in range(ord('a'), ord('z')+1)]
+
+# plaintext = "hello"
+# key_string = '6, 24, 1, 13'
+# key = parse_key(key_string)
+
+# encrypted_text = hill_cipher_encrypt(plaintext, key)
+# print("Encrypted text:", encrypted_text)
+
+
+
+
+
+
+
+
 import rsa
 def rsa_(mode, text, cipher_key=None):
     p, q = tuple(cipher_key.split(','))
@@ -307,7 +373,8 @@ algorithms = {
     7:rail_fence,
     8:rsa_,
     9:des_,
-    10:sha_1
+    10:sha_1,
+    11: hill_cipher_encrypt
 }
 
 # Examples
