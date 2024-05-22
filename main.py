@@ -274,7 +274,7 @@ def hill_cipher_encrypt(mode, plaintext, key):
     key = parse_key(key)
     key_size = len(key)
     padded_plaintext = pad_text(plaintext, key_size)
-    key_matrix = np.array(key).reshape(key_size, key_size)
+    key_matrix = np.array(key).reshape(key_size/2, key_size/2)
 
     encrypted_text = ""
     for i in range(0, len(padded_plaintext), key_size):
