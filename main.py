@@ -250,9 +250,34 @@ def rsa_(mode, text, cipher_key=None):
     elif mode==DECRYPT_MODE:
         return rsa.RSA_decryption(text, p, q)
 
-import DES
-def des(mode, text, key):
-    return DES.encrypt(text, key)
+
+
+from pyDes import des, PAD_PKCS5
+import base64
+def des(mode, text, key=None):
+    key = key.encode()
+    if mode == ENCRYPT_MODE:
+        # Initialize DES cipher object with the provided key
+        cipher = des(key, PAD_PKCS5)
+
+        # Encrypt the data
+        encrypted_data = cipher.encrypt(text)
+
+        # Encode the encrypted data using base64 for better representation
+        encrypted_data_base64 = base64.b64encode(encrypted_data)
+
+        return encrypted_data_base64
+    elif mode == DECRYPT_MODE:
+        # Initialize DES cipher object with the provided key
+        cipher = des(key, PAD_PKCS5)
+
+        # Decode the base64 encoded encrypted data
+        encrypted_data = base64.b64decode(text)
+
+        # Decrypt the data
+        decrypted_data = cipher.decrypt(encrypted_data)
+
+        return decrypted_data
 
 algorithms = {
     1:shift_cipher,
