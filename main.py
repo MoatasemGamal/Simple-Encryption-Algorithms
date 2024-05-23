@@ -63,20 +63,19 @@ def mono_alphabetic_cipher(mode, text, cipher_key:str):
             if char in A_Z:
                 i = A_Z.index(char)
                 cipher_text+=cipher_key[i]
-        return cipher_text, cipher_key
+        return cipher_text #, cipher_key
     elif mode == DECRYPT_MODE:
         plain_text = ''
         for char in text.upper():
             if char in cipher_key:
                 i = cipher_key.index(char)
                 plain_text+=A_Z[i]
-        return plain_text, cipher_key
+        return plain_text #, cipher_key
 
 def affine_cipher(mode, text, cipher_key):
     cipher_key=cipher_key.split(',')
     a=int(cipher_key[0].strip())
     text=re.sub('[^'+"".join(a_z)+']*', '', text.lower())
-    a_inverse = multiplicative_inverse(a, len(a_z))
     b=int(cipher_key[1].strip())
     if mode == ENCRYPT_MODE:
         cipher_text = ''
@@ -87,6 +86,7 @@ def affine_cipher(mode, text, cipher_key):
                 cipher_text += a_z[i]
         return cipher_text
     elif mode == DECRYPT_MODE:
+        a_inverse = multiplicative_inverse(a, len(a_z))
         plain_text = ''
         for char in text.lower():
             if char in a_z:
